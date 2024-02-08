@@ -96,7 +96,7 @@ fn make_image(
     let (red, green, blue) = (0, 0, 0);
 
     let (text_width, text_height) = drawing::text_size(scale, &font, "M");
-    let stride = max((text_width as f32 * PADDING) as i32, text_height);
+    let grid_stride = max((text_width as f32 * PADDING) as i32, text_height);
 
     for (y, line) in grid.iter().enumerate() {
         for (x, letter) in line.iter().map(char::to_string).enumerate() {
@@ -104,8 +104,8 @@ fn make_image(
             drawing::draw_text_mut(
                 &mut image,
                 Rgb([red, green, blue]),
-                x as i32 * stride + (stride - let_width) / 2,
-                y as i32 * stride,
+                x as i32 * grid_stride + (grid_stride - let_width) / 2,
+                y as i32 * grid_stride,
                 scale,
                 &font,
                 &letter,
@@ -114,13 +114,13 @@ fn make_image(
     }
 
     // Now make the key: the list of words hidden in the puzzle.
-    let key_y0 = (grid.len() as i32 + 1) * stride;
     let scale = Scale {
         x: text_height as f32 * 0.8,
         y: text_height as f32 * 0.8,
     };
-    let (_, y_stride) = drawing::text_size(scale, &font, "M");
-    for ((x, y), word) in column_iter(width, y_stride as u32, 3, wordlist.len()).zip(wordlist) {
+    let (_, key_stride) = drawing::text_size(scale, &font, "M");
+    let key_y0 = grid.len() as i32 * grid_stride + key_stride;
+    for ((x, y), word) in column_iter(width, key_stride as u32, 3, wordlist.len()).zip(wordlist) {
         drawing::draw_text_mut(
             &mut image,
             Rgb([red, green, blue]),
